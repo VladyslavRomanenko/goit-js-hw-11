@@ -67,7 +67,7 @@ const onSearch = event => {
 
 function createImg(img) {
   return `<div class="photo-card">
-  <img src="${img.webformatURL}" alt="${img.tags}" loading="lazy" width="330" height="250" />
+  <img src="${img.webformatURL}" alt="${img.tags}" loading="lazy" width="320" height="220" />
   <div class="info">
     <p class="info-item">
       <b>Likes <br>${img.likes}</br></b>
