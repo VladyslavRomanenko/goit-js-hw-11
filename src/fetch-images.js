@@ -7,13 +7,5 @@ export const fetchImages = async (name, page) => {
   const { data } = await axios.get(
     `?key=${MY_KEY}&q=${name}&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${page}`
   );
-  return data.hits;
-};
-
-export const getTotalHits = async name => {
-  const { data } = await axios.get(
-    `?key=${MY_KEY}&q=${name}&image_type=photo&orientation=horizontal&safesearch=true`
-  );
   return data;
-  
 };

@@ -1,47 +1,46 @@
 import { fetchImages } from './fetch-images';
-import { getTotalHits } from './fetch-images';
 import Notiflix from 'notiflix';
 import debounce from 'lodash.debounce';
 
 const formRef = document.querySelector('.search-form');
 const galleryRef = document.querySelector('.gallery');
-const buttonRef = document.querySelector('.button');
 const loadMoreRef = document.querySelector('.load-more');
 
-let pack;
 let page = 1;
 
 loadMoreRef.style.display = 'none';
 
-const onInput = async event => {
-  event.preventDefault();
+const onInput = debounce(async () => {
   try {
-    let value = formRef.elements.searchQuery.value;
+    const value = formRef.elements.searchQuery.value;
     page = 1;
-    pack = await fetchImages(value, page);
-    const total = await getTotalHits(value);
+    const packs = await fetchImages(value, page);
+    const pack = packs.hits;
     loadMoreRef.style.display = 'none';
+    const arrayImg = pack.map(img => createImg(img)).join('');
+    galleryRef.insertAdjacentHTML('afterbegin', arrayImg);
+    loadMoreRef.style.display = 'block';
     if (pack.length === 0) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     } else {
-      Notiflix.Notify.info(`Hooray! We found ${total.totalHits}  images.`);
+      Notiflix.Notify.info(`Hooray! We found ${packs.totalHits}  images.`);
     }
   } catch (error) {
     throw Error(error);
   }
-};
+}, 500);
 
 const onLoadMore = async () => {
   try {
     page++;
     const value = formRef.elements.searchQuery.value;
-    const newPack = await fetchImages(value, page);
-    const arrayImg = newPack.map(img => createImg(img)).join('');
-    const total = await getTotalHits(value);
-    galleryRef.insertAdjacentHTML('beforeend', arrayImg);
-    if (page * 40 >= total.totalHits) {
+    const newPacks = await fetchImages(value, page);
+    const newPack = newPacks.hits;
+    const markup = newPack.map(img => createImg(img)).join('');
+    galleryRef.insertAdjacentHTML('beforeend', markup);
+    if (page * 40 >= newPacks.totalHits) {
       loadMoreRef.style.display = 'none';
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
@@ -52,17 +51,11 @@ const onLoadMore = async () => {
   }
 };
 
-const onSearch = event => {
+formRef.addEventListener('submit', event => {
   event.preventDefault();
-  try {
-    const arrayImg = pack.map(img => createImg(img)).join('');
-    galleryRef.insertAdjacentHTML('afterbegin', arrayImg);
-    galleryRef.innerHTML = arrayImg;
-    loadMoreRef.style.display = 'block';
-  } catch (error) {
-    throw Error(error);
-  }
-};
+  onInput();
+});
+loadMoreRef.addEventListener('click', onLoadMore);
 
 function createImg(img) {
   return `<div class="photo-card">
@@ -83,6 +76,3 @@ function createImg(img) {
   </div>
 </div>`;
 }
-formRef.addEventListener('input', debounce(onInput, 500));
-buttonRef.addEventListener('click', onSearch);
-loadMoreRef.addEventListener('click', onLoadMore);
