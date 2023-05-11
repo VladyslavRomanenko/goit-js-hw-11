@@ -2,7 +2,6 @@ import { fetchImages } from './fetch-images';
 import { getTotalHits } from './fetch-images';
 import Notiflix from 'notiflix';
 import debounce from 'lodash.debounce';
-import SimpleLightbox from 'simplelightbox';
 
 const formRef = document.querySelector('.search-form');
 const galleryRef = document.querySelector('.gallery');
@@ -67,7 +66,7 @@ const onSearch = event => {
 
 function createImg(img) {
   return `<div class="photo-card">
-  <img src="${img.webformatURL}" alt="${img.tags}" loading="lazy" width="320" height="220" />
+  <img src="${img.webformatURL}" alt="${img.tags}" loading="lazy"/>
   <div class="info">
     <p class="info-item">
       <b>Likes <br>${img.likes}</br></b>
@@ -87,8 +86,3 @@ function createImg(img) {
 formRef.addEventListener('input', debounce(onInput, 500));
 buttonRef.addEventListener('click', onSearch);
 loadMoreRef.addEventListener('click', onLoadMore);
-
-const lightbox = new SimpleLightbox('.gallery a', {
-  captions: true,
-  captionDelay: 250,
-});
